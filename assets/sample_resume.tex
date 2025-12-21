@@ -1,0 +1,148 @@
+\documentclass[11pt]{article}       % set main text size
+\usepackage[letterpaper,                % set paper size to letterpaper. change to a4paper for resumes outside of North America
+top=0.5in,                          % specify top page margin
+bottom=0.5in,                       % specify bottom page margin
+left=0.5in,                         % specify left page margin
+right=0.5in]{geometry}              % specify right page margin
+                       
+\usepackage{XCharter}               % set font. comment this line out if you want to use the default LaTeX font Computer Modern
+\usepackage[T1]{fontenc}            % output encoding
+\usepackage[utf8]{inputenc}         % input encoding
+\usepackage{enumitem}               % enable lists for bullet points: itemize and \item
+\usepackage[hidelinks]{hyperref}    % format hyperlinks
+\usepackage{titlesec}               % enable section title customization
+\raggedright                        % disable text justification
+\pagestyle{empty}                   % disable page numbering
+\usepackage[normalem]{ulem}
+
+% ensure PDF output will be all-Unicode and machine-readable
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+% format section headings: bolding, size, white space above and below
+\titleformat{\section}{\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule\vspace{-6.5pt}]
+
+% format bullet points: size, white space above and below, white space between bullets
+\renewcommand\labelitemi{$\vcenter{\hbox{\small$\bullet$}}$}
+\setlist[itemize]{itemsep=-2pt, leftmargin=12pt, topsep=7pt} %%% Test various topsep values to fix vertical spacing errors
+
+% resume starts here
+\begin{document}
+
+% name
+\centerline{\Huge Kaustav Paul}
+
+\vspace{5pt}
+
+% titles
+\centerline{\large{Software Engineer – Full-Stack | Distributed Systems \& Microservices | Cloud Technologies}}
+
+\vspace{3pt}
+
+% contact information
+\centerline{
+{
+\href{tel:+91-9830843664}{+91-9830843664} |
+\uline{\href{mailto:paul.kaustav@outlook.com}{paul.kaustav@outlook.com}} | \uline{\href{https://www.linkedin.com/in/kpaul98/}{LinkedIn}} | \uline{\href{https://leetcode.com/u/kaustic-soda/}{LeetCode}} |
+\uline{\href{https://github.com/k98p}{GitHub}}
+}
+}
+
+\vspace{-10pt}
+
+% skills section
+\section*{Skills}
+\textbf{Languages \& Scripting:} Java, Scala, Python, C++, TypeScript, Bash \\
+\textbf{Backend Frameworks \& Tools:} Spring Boot, Akka, Flask, Node.js, Apache Airflow, WebSockets, JWT \\
+\textbf{Big Data \& Distributed Systems:} Apache Spark, Hadoop, YARN, Kafka, PubSub, Redis \\
+\textbf{Database \& Data Warehousing:} Oracle, PostgreSQL, HDFS, Google Cloud Storage, GCP BigQuery \\
+\textbf{Cloud Platforms:} Google Cloud Platform (GCP), Red Hat OpenShift \\
+\textbf{DevOps \& Infrastructure:} Docker, Kubernetes (k8s), Helm, Jenkins, Terraform, Maven, Gradle \\
+\textbf{Monitoring \& Logging:} Grafana, Prometheus, Splunk \\
+\textbf{CS Fundamentals:} Data Structures \& Algorithms, System Design, OOP, DBMS, OS, Computer Networks \\
+
+\vspace{-6.5pt}
+
+% experience section
+\section*{Experience}
+\textbf{Deutsche Bank} \hfill {Hybrid} \\
+\textit{{Associate Engineer - \textbf{Accelerated Promotion}} \hfill {Oct 2023 -- Present}} \\
+\vspace{-9pt}
+\begin{itemize}
+    \item Implemented a \textbf{Redis-based} queueing system to replace FIFO YARN scheduling, \textbf{allowing time sensitive jobs to be processed first} and ensuring that stress run outputs are made available to users with \textbf{minimal delay}
+    \item Designed and developed a \textbf{high-performance REST API and WebSocket service} using Scala, Akka, Java, and Spring, e\textbf{nabling real-time access} to stress run summaries on UI, significantly improving system responsiveness
+    \item Developed a \textbf{scalable} data segregation service using Java, Springboot \& Spark to organize trade data by country, enforcing \textbf{data governance protocols and enabling compliant cloud migration}
+    \item Built a GCP Cloud Composer-based data orchestration solution to \textbf{automate data transfers} from on-prem HDFS to Google Cloud Storage, \textbf{reducing operational storage costs by 85\%} under hybrid architecture rules
+    \item Deployed JupyterHub on GKE using Terraform and GitHub Actions, configured network access to dbLLM APIs, enabling users to \textbf{analyze GCP-hosted data} using GPU-accelerated notebooks
+  % \item Orchestrated a Cloud Composer DAG to detect and process Parquet files from GCS bucket, automating their loading into BigQuery and eliminating 10+ hours of weekly manual work
+  % \item Migrated a PySpark aggregation script to BigQuery, reducing processing time from 40 minutes on Hadoop to 10 minutes, significantly enhancing data analysis efficiency
+
+\end{itemize}
+% \vspace{-3pt}
+\textbf{Deutsche Bank} \hfill {Hybrid} \\
+\textit{{Technology Analyst} \hfill {Jul 2021 -- Sep 2023}} \\
+\vspace{-9pt}
+\begin{itemize}
+  \item Designed and developed a \textbf{scalable Data Quality Check framework} to validate large-scale datasets, using Java, Springboot \& Spark; enabled users to \textbf{confidently sign off} stress-run processes based on data integrity.
+  % \item Built a Scala-Akka-based solution to delete redundant HDFS files based on job statuses in the stress testing pipeline, thus freeing up space and preventing weekly storage quota issues
+  \item Automated the loading of \textbf{JIRA, ServiceNow \& Incidents data} into ADC dashboard using Apache Airflow, increasing metric update frequency from \textbf{monthly to daily} and improving \textbf{operational visibility across teams}
+  \item Implemented TDD for Stress Testing UI application using Jasmine (unit tests) and Protractor (e2e), achieving \textbf{80\%+ test coverage for production compliance}
+\end{itemize}
+
+\textbf{SkyBits Technologies Pvt Ltd} \hfill {Kolkata, West Bengal} \\
+\textit{{Fullstack Developer Intern} \hfill Apr 2020 -- Jun 2020} \\
+\vspace{-9pt}
+\begin{itemize}
+  \item Engineered a data processing pipeline to clean and transform user-provided business KPIs and SPIs and designed an intuitive dashboard to improve daily decision-making and \textbf{enhance stakeholder engagement}
+  \item Technologies used: Node.js, MySQL, ETL, React, Chart.js, React Gauge
+\end{itemize}
+
+\textbf{Itobuz Technologies Pvt Ltd} \hfill {Kolkata, West Bengal} \\
+\textit{{MERN Stack Developer Intern} \hfill Dec 2019 -- Jan 2020} \\
+\vspace{-9pt}
+\begin{itemize}
+  \item Developed an automated invoice management system for streamlined operations and integrated a secure role-based access control (RBAC) system to \textbf{safeguard sensitive financial data}
+  \item Technologies used: MERN stack (MongoDB, Express.js, React, Node.js), JWT authentication
+\end{itemize}
+
+% \textbf{Job Title,} \href{https://www.fstl1992.com/}{Company} -- City, ST \hfill XXXX -- XXXX \\
+% \vspace{-9pt}
+
+\vspace{-18.5pt}
+
+% projects section
+% \section*{Hackathons}
+
+% \textbf{DB AML - DB Global Tech Hackathon 2023} \hfill Jul 2023 \\
+% \vspace{-9pt}
+% \begin{itemize}
+%   \item Developed a cloud-based money laundering screening solution using BigQuery ML on GCP, achieving 90\% model accuracy and reducing manual workload
+%   \item Won Round 1 from Pune location and secured a Top 4 finish out of 60 entries in Round 2
+% \end{itemize}
+
+% alternate formatting for projects section
+% \section*{Projects}
+% \begin{itemize}
+%   \item \textbf{QuantSoftware Toolkit:} Open source Python library for data analysis and machine learning for finance
+%   \item \textbf{GitHub Visualization:} Data visualization of Git Log data using D3 to analyze project trends over time
+%   \item \textbf{Recommendation System:} Music and movie recommender systems using collaborative filtering on public datasets
+%   \item \textbf{Mac Setup:} Book that gives step by step instructions on setting up developer environment on Mac OS
+% \end{itemize}
+
+% LISTING ALL THE ACHIEVEMENTS
+% \section*{Achievements}
+% \begin{itemize}
+%   \item Received Excellence Award for leading trade data migration to GCP while ensuring full compliance with data governance protocols
+%   \item Secured 1st position at India Tech Center, Pune; ranked top 4 globally in DB Global Tech Hackathon 2023.
+%   % \item Achieved All-India Rank 5,272 out of 1.2 million candidates in JEE Mains 2017, top 0.44\% nationally
+% \end{itemize}
+
+% \vspace{-18.5pt}
+
+% education section
+% TODO: Add relevant courses like DSA, software ENgineering, OOPS
+\section*{Education}
+\textbf{{Indian Institute of Engineering Science and Technology, Shibpur} \hfill {Jul 2017 - Jun 2021}} \\
+\textit{{BTech in Computer Science and Engineering} \hfill {8.86/10 CGPA}} \\
+% Relevant Courses: Data Structures \& Algorithms (DSA), Object-Oriented Programming (OOP), DBMS, Operating Systems, Computer Networks, Software Engineering
+\end{document}
