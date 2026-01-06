@@ -9,12 +9,13 @@ jobs_router = APIRouter(
 )
 
 @jobs_router.get("/scrape")
-async def scrape_jobs(pages: int = 3):
+async def scrape_jobs(pages: int = 3, time_delta: int = 86400):
     return await fetch_jobs_list(
         BASE_URL,
         HEADERS.copy(),
         PARAMS.copy(),
-        pages
+        pages,
+        time_delta
     )
 
 @jobs_router.get("/fetch-details")

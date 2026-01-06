@@ -30,8 +30,9 @@ async def fetch_job_list_paginated(httpclient, base_url, headers, params, page):
         print(f"Failed to load data for page: {page} due to {e}")
     return None
 
-async def fetch_jobs_list(base_url: str, headers: dict, params: dict, pages: int):
+async def fetch_jobs_list(base_url: str, headers: dict, params: dict, pages: int, time_delta: int):
     async with httpx.AsyncClient() as client:
+        params["f_TPR"] = f"r{time_delta}"
         tasks = [fetch_job_list_paginated(client, base_url, headers, params, page) for page in range(pages)]
         job_postings = await asyncio.gather(*tasks)
         return [jobs for paginated_job_list in job_postings if paginated_job_list for jobs in paginated_job_list]
