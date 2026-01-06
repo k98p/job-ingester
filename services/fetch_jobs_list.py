@@ -26,13 +26,23 @@ async def fetch_job_list_paginated(httpclient, base_url, headers, params, page):
                     "job_location": job_location
                 })
             return job_postings
+        else:
+            print(f"Error loading the page {page}, response: {response.status_code}")
     except Exception as e:
         print(f"Failed to load data for page: {page} due to {e}")
     return None
 
 async def fetch_jobs_list(base_url: str, headers: dict, params: dict, pages: int, time_delta: int):
+    results = []
     async with httpx.AsyncClient() as client:
         params["f_TPR"] = f"r{time_delta}"
-        tasks = [fetch_job_list_paginated(client, base_url, headers, params, page) for page in range(pages)]
-        job_postings = await asyncio.gather(*tasks)
-        return [jobs for paginated_job_list in job_postings if paginated_job_list for jobs in paginated_job_list]
+        for page in range(pages):
+            paginated_jobs = await fetch_job_list_paginated(
+                client, base_url, headers, params, page
+            )
+            if paginated_jobs:
+                results.extend(paginated_jobs)
+            else:
+                break
+            await asyncio.sleep(0.2)  # throttle (200ms)
+    return results
