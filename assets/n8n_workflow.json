@@ -1,0 +1,688 @@
+{
+  "name": "Job Scraper",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        -96
+      ],
+      "id": "a27cf308-2e19-4321-94be-f55ebe3e3189",
+      "name": "Schedule Trigger",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "url": "https://job-ingester-604096409502.asia-south1.run.app/jobs/scrape",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pages",
+              "value": "30"
+            },
+            {
+              "name": "time_delta",
+              "value": "172800"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        -96
+      ],
+      "id": "96b634f5-4c40-4a2d-944a-890743883e14",
+      "name": "Scrape Jobs"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        784,
+        -96
+      ],
+      "id": "d143a64b-9eb1-4017-8d86-d9d27fed0c35",
+      "name": "Loop Over Job Postings"
+    },
+    {
+      "parameters": {
+        "url": "=https://job-ingester-604096409502.asia-south1.run.app/jobs/fetch-details?url={{ $json.url }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1008,
+        -400
+      ],
+      "id": "48d8427e-1be4-4660-b898-41c022b89d8a",
+      "name": "Extract Job Details"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-exp:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        -32
+      ],
+      "id": "e0e608ba-d503-47a3-83da-ca867a6f958a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Apir60wbbi8DJJfB",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=ROLE: Act as a Senior Hiring Manager + ATS Optimization Expert for top-tier tech companies. Target candidate seniority: 4–5 years experience (mid–senior engineer).\n\nINPUT: \n* candidate_profile: containing skills and work-ex (in JSON format)\n* job_description: full JD text\n\nTASKS: \n* Evaluate profile–JD alignment\n* Produce a fit score (0–100)\n* Give one-line justification\n\nSCORING SIGNALS: \nScore must reflect:\n* JD technical skill coverage - major\n* Depth, scale, and measurable impact - major\n* Mid-senior traits (design, ownership, mentoring, cross-team work) - medium\n* Soft-skill alignment - medium\n* ATS keyword density - medium\n\nOUTPUT (raw, unformatted JSON only, with no markdown formatting or natural language explanations before or after the JSON):\n{\n  \"score\": 0,\n  \"score_reason\": \"\",\n  \"strengths\": [\"\", \"\"],\n  \"gaps\": [\"\", \"\"]\n}\n\nQUALITY BAR:\n* Target FAANG / Tier-1 product companies\n* ATS-friendly, concise, impact-driven\n* No fluff, no hallucinations\n\nBEGIN:\n* canidate_profile: {\n  \"overview\": \"Software Engineer with 4.5 years of SDLC experience, specializing in designing and developing scalable micro-services and high-availability service architectures. Experienced in collaborating with business\nstakeholders, product owners, and cross-team engineers to deliver performance-critical software. Strong foundation in coding standards, code reviews, CI/CD, and testing, with a Bachelor’s degree in Computer Science\",\n  \"skills\": {\n    \"Languages & Scripting\": [\n      \"Java\",\n      \"Python\",\n      \"C++\",\n      \"TypeScript\",\n      \"Bash\"\n    ],\n    \"Backend Frameworks & Workflow Tools\": [\n      \"Spring Boot\",\n      \"Flask\",\n      \"FastAPI\",\n      \"Apache Airflow\",\n      \"n8n\"\n    ],\n    \"Database, Storage & Caching Systems\": [\n      \"Oracle\",\n      \"PostgreSQL\",\n      \"Google Cloud Storage (GCS)\",\n      \"Redis\"\n    ],\n    \"Cloud Platforms & Infra\": [\n      \"Google Cloud Platform (GCP)\",\n      \"Red Hat OpenShift\",\n      \"Terraform\"\n    ],\n    \"DevOps & Build Tools\": [\n      \"Docker\",\n      \"Kubernetes (k8s)\",\n      \"Helm\",\n      \"Jenkins\",\n      \"GitHub Actions\",\n      \"Maven\"\n    ],\n    \"Practices\": [\n      \"Test-Driven Development (TDD)\",\n      \"Clean Code\",\n      \"Code Reviews\",\n      \"Agile / Scrum\",\n      \"CI/CD (Git, Jenkins, GitHub Actions)\"\n    ]\n  },\n  \"relevant_experience\": [\n    \"Collaborated in a cross-functional Agile team with business stakeholders, product owners, and platform engineers, consistently delivering production-grade features under tight regulatory deadlines\",\n    \"Designed and implemented a Flask-based Data Migration Service, transforming a monolithic implementation into a scalable, OOP-based design, significantly improving maintainability, scalability, and long-term resilience\",\n    \"Architected a CI/CD pipeline for the Data Migration Service using GitHub Actions, enforcing Sonar quality gates and JFrog Xray scanning to ensure release artifact quality and reduce release rollbacks by 35%\",\n    \"Conducted structured knowledge-transfer sessions for new joiners on core platform components and mentored interns, contributing to multiple conversions into full-time roles\",\n    \"Replaced the default FIFO YARN scheduler by implementing a Redis-based priority queueing system, accelerating stress-run output delivery to business users by 45%\",\n    \"Developed a Cloud Composer-based data segregation workflow to segregate and transfer trade data from on-prem HDFS to Google Cloud Storage (GCS), reducing operational storage costs by 85% under hybrid architecture rules\",\n    \"Enabled comprehensive end-to-end validation of cloud features by integrating on-prem test automation with Google Cloud Platform (GCP) resources, reducing pre-production defects by 30% and lowering deployment risk for GCP-specific changes\",\n    \"Resolved over 120 SonarQube issues and remediated more than 35 open-source software (OSS) vulnerabilities in the ingester service, eliminating all critical findings and significantly improving application security and code maintainability\",\n    \"Automated the loading of JIRA and incident data into a KPI dashboard using Apache Airflow, increasing metric update frequency from monthly to daily and improving operational visibility across teams\",\n    \"Implemented test-driven development (TDD) for the Stress Testing UI application using Jasmine for unit testing and Protractor for end-to-end testing, achieving over 80% test coverage for production compliance\"\n  ]\n}\n* job_description: {{ $('Extract Job Details').item.json[\"job_description\"] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1680,
+        -384
+      ],
+      "id": "bc7bf982-62ca-4105-9557-d9b737fd9ddd",
+      "name": "AI Agent",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "resource": "object",
+        "operation": "create",
+        "bucketName": "latex-resume-inputs",
+        "objectName": "={{ $('Extract Job Details').item.json.linked_in_apply.split(\"/\").last() + \".tex\" }}",
+        "createFromBinary": false,
+        "createContent": "={{ $('Parse LLM Output').item.json.enhanced_resume.replace(/\\\\n/g, '\\n').replace(/\\\\\\\\/g, '\\\\') }}",
+        "createData": {},
+        "createQuery": {},
+        "encryptionHeaders": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        -400
+      ],
+      "id": "46ab1edc-3113-4fba-ae6c-4b5c972d8bb7",
+      "name": "Create an object",
+      "credentials": {
+        "googleCloudStorageOAuth2Api": {
+          "id": "TBYKWhA1bECUavaZ",
+          "name": "Google Cloud Storage account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://job-ingester-604096409502.asia-south1.run.app/resume/fetch-base",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "resume_file_name",
+              "value": "swe_base_resume.tex"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        -96
+      ],
+      "id": "faf3655b-dbd9-484c-8402-7c237bc52a8a",
+      "name": "Fetch Resume"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "54ba0106-ed07-4e62-8a63-4e1ce5703612",
+              "leftValue": "={{ $json.months_of_experience }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1232,
+        -400
+      ],
+      "id": "58cc9cc0-e631-45c2-81dc-48b1d033798f",
+      "name": "Check MOE Existence"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f93352f8-3040-4dd5-aa22-870d3e8a0610",
+              "leftValue": "={{ $('Extract Job Details').item.json.months_of_experience }}",
+              "rightValue": 36,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "5c80f88f-9fc9-422b-ad45-229d9903006a",
+              "leftValue": "={{ $('Extract Job Details').item.json.months_of_experience }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1440,
+        -448
+      ],
+      "id": "2b1e7a73-d130-46d8-9f4d-879837b40dfa",
+      "name": "Check MOE"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "10gKjUizOfaZWGy6bm9iTM7xxMWiJwISDh8xygVnVt78",
+          "mode": "list",
+          "cachedResultName": "Job_Application_Spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10gKjUizOfaZWGy6bm9iTM7xxMWiJwISDh8xygVnVt78/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Software Engineer",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10gKjUizOfaZWGy6bm9iTM7xxMWiJwISDh8xygVnVt78/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company": "={{ $('Extract Job Details').item.json.Kompany }}",
+            "Title": "={{ $('Extract Job Details').item.json.Title }}",
+            "Location": "={{ $('Extract Job Details').item.json.Location }}",
+            "Date Posted": "={{ $('Extract Job Details').item.json['Date Posted'] }}",
+            "Employment Type": "={{ $('Extract Job Details').item.json.employment_type }}",
+            "Min Qualification": "={{ $('Extract Job Details').item.json.min_qualification }}",
+            "Application Link": "={{ $('Extract Job Details').item.json.linked_in_apply }}",
+            "Resume Link": "=https://www.overleaf.com/docs?snip_uri=https://storage.googleapis.com/latex-resume-inputs/swe_base_resume.tex",
+            "MOE": "={{ $('Extract Job Details').item.json.months_of_experience }}",
+            "Job Scrapetime": "={{ $('Schedule Trigger').item.json.timestamp }}",
+            "Score": "={{ $('Parse LLM Output').item.json.score }}",
+            "Score Reasoning": "={{ $('Parse LLM Output').item.json.score_reason }}",
+            "Strengths": "={{ $('Parse LLM Output').item.json.strengths.join(\" \") }}",
+            "Weaknesses": "={{ $('Parse LLM Output').item.json.gaps.join(\" \") }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date Posted",
+              "displayName": "Date Posted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Scrapetime",
+              "displayName": "Job Scrapetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Employment Type",
+              "displayName": "Employment Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Min Qualification",
+              "displayName": "Min Qualification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MOE",
+              "displayName": "MOE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Application Link",
+              "displayName": "Application Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score Reasoning",
+              "displayName": "Score Reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Strengths",
+              "displayName": "Strengths",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Weaknesses",
+              "displayName": "Weaknesses",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Resume Link",
+              "displayName": "Resume Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2704,
+        -272
+      ],
+      "id": "fd4ff232-5d7b-4d8d-ae39-c61a607c18f8",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OvKSGDyY0MqyQVfH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "19651002-e09e-4196-8f30-11b0d5394a83",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2256,
+        -384
+      ],
+      "id": "32a0c8e5-ca70-40e2-ad3c-85da83b95b31",
+      "name": "Check Score"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Add a new field called 'myNewField' to the JSON of the item\n// $input.item.json.myNewField = 1;\nvar llmOutput = $input.item.json.output;\nvar cleanOutput = llmOutput.replace(/```json/g, '')\n    .replace(/```/g, '')\n    .trim();\nconsole.log(cleanOutput)\nvar parsedOutput = JSON.parse(cleanOutput)\n\nreturn {\n  json: {\n    score: parsedOutput.score,\n    score_reason: parsedOutput.score_reason,\n    strengths: parsedOutput.strengths,\n    gaps: parsedOutput.gaps,\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        -384
+      ],
+      "id": "87920992-063c-4185-af5a-6ae3870e80e2",
+      "name": "Parse LLM Output"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Jobs": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Job Postings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Job Postings": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Extract Job Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Job Details": {
+      "main": [
+        [
+          {
+            "node": "Check MOE Existence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse LLM Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Resume": {
+      "main": [
+        [
+          {
+            "node": "Scrape Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check MOE Existence": {
+      "main": [
+        [
+          {
+            "node": "Check MOE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check MOE": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Job Postings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an object": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Job Postings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Score": {
+      "main": [
+        [
+          {
+            "node": "Create an object",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Job Postings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse LLM Output": {
+      "main": [
+        [
+          {
+            "node": "Check Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7f0b7fd5-8704-4814-9571-d009e24e3643",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b8a36927d3e58a8717f7045870613598aad77cabf47421fd058203ff1b536684"
+  },
+  "id": "Qk9wPjPX7WvA89WX",
+  "tags": []
+}
